@@ -8,90 +8,110 @@
 
 window.onload = function () {
 
-    // Definitions
-    var canvas = document.getElementById("paint-canvas");
-    var context = canvas.getContext("2d");
-    var boundings = canvas.getBoundingClientRect();
-  
-    // Specifications
-    var mouseX = 0;
-    var mouseY = 0;
-    context.strokeStyle = 'black'; // initial brush color
-    context.lineWidth = 1; // initial brush width
-    var isDrawing = false;
-  
-  
-    // Handle Colors
-    var colors = document.getElementsByClassName('colors')[0];
-  
-    colors.addEventListener('click', function(event) {
-      context.strokeStyle = event.target.value || 'black';
-    });
-  
-    // Handle Brushes
-    var brushes = document.getElementsByClassName('brushes')[0];
-  
-    brushes.addEventListener('click', function(event) {
-      context.lineWidth = event.target.value || 1;
-    });
-  
-    // Mouse Down Event
-    canvas.addEventListener('mousedown', function(event) {
-      setMouseCoordinates(event);
-      isDrawing = true;
-  
-      // Start Drawing
-      context.beginPath();
-      context.moveTo(mouseX, mouseY);
-    });
-  
-    // Mouse Move Event
-    canvas.addEventListener('mousemove', function(event) {
-      setMouseCoordinates(event);
-  
-      if(isDrawing){
-        context.lineTo(mouseX, mouseY);
-        context.stroke();
-      }
-    });
-  
-    // Mouse Up Event
-    canvas.addEventListener('mouseup', function(event) {
-      setMouseCoordinates(event);
-      isDrawing = false;
-    });
-  
-    // Handle Mouse Coordinates
-    function setMouseCoordinates(event) {
-      mouseX = event.clientX - boundings.left;
-      mouseY = event.clientY - boundings.top;
+  // Definitions
+  var canvas = document.getElementById("paint-canvas");
+  var context = canvas.getContext("2d");
+  var boundings = canvas.getBoundingClientRect();
+
+  // Specifications
+  var isDrawing = false;
+
+  // Handle Colors
+  var colors = document.querySelectorAll('.colors button');
+
+colors.forEach(function(button) {
+  button.addEventListener('click', function(event) {
+    context.strokeStyle = button.value || 'black';
+  });
+});
+
+  // Handle Brushes
+  var brushes = document.querySelectorAll('.brushes button');
+
+brushes.forEach(function(button) {
+  button.addEventListener('click', function(event) {
+    context.lineWidth = parseFloat(button.value) || 1;
+  });
+});
+
+  // Mouse Down and Touch Start Events
+  function startDrawing(event) {
+    event.preventDefault();
+    setCoordinates(event);
+    isDrawing = true;
+
+    // Start Drawing
+    context.beginPath();
+    context.moveTo(mouseX, mouseY);
+  }
+
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('touchstart', startDrawing);
+
+  // Mouse Move and Touch Move Events
+  function draw(event) {
+    event.preventDefault();
+    if (isDrawing) {
+      setCoordinates(event);
+      context.lineTo(mouseX, mouseY);
+      context.stroke();
     }
-  
-    // Handle Clear Button
-    var clearButton = document.getElementById('clear');
-  
-    clearButton.addEventListener('click', function() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    });
+  }
 
-    var cartValue = 0;
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('touchmove', draw);
 
-    //handle add to cart button
+  // Mouse Up and Touch End Events
+  function stopDrawing(event) {
+    event.preventDefault();
+    setCoordinates(event);
+    isDrawing = false;
+  }
 
-    var addCartButton = document.getElementById('add-cart');
-    addCartButton.addEventListener('click', function() {
-        document.getElementById('inc').innerHTML = ++cartValue;
-    } )
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('touchend', stopDrawing);
 
-    var goToCartButton = document.getElementById('goToCart');
-    goToCartButton.addEventListener('click', function() {
-        window.location.href = `cart.html?cartValue=${cartValue}`;
-    } )
+  // Handle Mouse and Touch Coordinates
+  var mouseX = 0;
+  var mouseY = 0;
 
-    var buyNowButton = document.getElementById('buy-now');
-    buyNowButton.addEventListener('click', function() {
-        window.location.href = `cart.html?cartValue=1`;
-    } )
+  function setCoordinates(event) {
+    var clientX, clientY;
+    if (event.clientX && event.clientY) {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    } else if (event.touches && event.touches.length > 0) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    }
+    mouseX = clientX - boundings.left;
+    mouseY = clientY - boundings.top;
+  }
 
-  };
-  
+  // Handle Clear Button
+  var clearButton = document.getElementById('clear');
+
+  clearButton.addEventListener('click', function () {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  var cartValue = 0;
+
+  //handle add to cart button
+
+  var addCartButton = document.getElementById('add-cart');
+  addCartButton.addEventListener('click', function () {
+    document.getElementById('inc').innerHTML = ++cartValue;
+  })
+
+  var goToCartButton = document.getElementById('goToCart');
+  goToCartButton.addEventListener('click', function () {
+    window.location.href = `cart.html?cartValue=${cartValue}`;
+  })
+
+  var buyNowButton = document.getElementById('buy-now');
+  buyNowButton.addEventListener('click', function () {
+    window.location.href = `cart.html?cartValue=1`;
+  })
+
+};
