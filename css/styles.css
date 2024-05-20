@@ -10826,7 +10826,7 @@ textarea.form-control-lg {
 }
 
 .main {
-  width: 600px;
+  width: 400px;
   border: 1px solid #e0e0e0;
   margin: 0 auto;
   display: flex;
@@ -10834,7 +10834,7 @@ textarea.form-control-lg {
 }
 
 .left-block {
-  width: 160px;
+  width: 30%;
   border-right: 1px solid #e0e0e0;
 }
 
